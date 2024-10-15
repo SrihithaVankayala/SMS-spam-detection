@@ -7,7 +7,7 @@ from sklearn.metrics import classification_report
 # Load the SMS Spam Collection dataset
 data = pd.read_csv('spam.csv', encoding='latin-1')  # Adjust encoding if needed
 data = data[['v1', 'v2']]  # Assuming 'v1' is the label and 'v2' is the message
-data.columns = ['label', 'message']
+data.columns = ['label', 'message']  # Rename columns
 
 # Encode labels: ham = 0, spam = 1
 data['label'] = data['label'].map({'ham': 0, 'spam': 1})
