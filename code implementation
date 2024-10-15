@@ -1,0 +1,43 @@
+import pandas as pd
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.model_selection import train_test_split
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.metrics import classification_report
+
+# Load the SMS Spam Collection dataset
+data = pd.read_csv('spam.csv', encoding='latin-1')  # Adjust encoding if needed
+data = data[['v1', 'v2']]  # Assuming 'v1' is the label and 'v2' is the message
+data.columns = ['label', 'message']
+
+# Encode labels: ham = 0, spam = 1
+data['label'] = data['label'].map({'ham': 0, 'spam': 1})
+
+# Split the dataset into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(data['message'], data['label'], test_size=0.2, random_state=42)
+
+# Vectorize the text data using TF-IDF
+vectorizer = TfidfVectorizer()
+X_train_vectorized = vectorizer.fit_transform(X_train)
+X_test_vectorized = vectorizer.transform(X_test)
+
+# Initialize the Naive Bayes model
+model = MultinomialNB()
+
+# Train the model
+model.fit(X_train_vectorized, y_train)
+
+# Make predictions on the test set
+y_pred = model.predict(X_test_vectorized)
+
+# Evaluate the model performance
+print(classification_report(y_test, y_pred))
+
+# Optional: Test the model with a custom message
+def predict_spam(message):
+    message_vectorized = vectorizer.transform([message])
+    prediction = model.predict(message_vectorized)
+    return "spam" if prediction[0] == 1 else "ham"
+
+# Example test
+test_message = "Congratulations! You've won a free ticket!"
+print(f'Test Message: "{test_message}" is classified as: {predict_spam(test_message)}')
